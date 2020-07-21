@@ -8,7 +8,7 @@ class NewVisitorTest(unittest.TestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
-        self.browser.implicitly_wait(3)
+        self.browser.implicitly_wait(2)
 
     def tearDown(self):
         self.browser.quit()
@@ -37,7 +37,9 @@ class NewVisitorTest(unittest.TestCase):
 
         table = self.browser.find_element_by_id("id_list_table")
         rows = table.find_elements_by_tag_name("tr")
-        self.assertTrue(any(row.text == "1: Buy peacock feathers" for row in rows))
+        self.assertTrue(any(row.text == "1: Buy peacock feathers" for row in rows),
+                        'New to-do item did not appear in table'
+                        )
 
         # There is still a textbox inviting her do add another item. The
         # enters "Use peacock feathers to make a fly" Edith is very methodical
