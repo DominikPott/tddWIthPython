@@ -1,3 +1,5 @@
+import re
+
 from django.urls import resolve
 from django.test import TestCase
 from django.http import HttpRequest
@@ -14,5 +16,27 @@ class HomaPageTest(TestCase):
     def test_home_page_returns_correct_html(self):
         request = HttpRequest()
         response = home_page(request)
-        expected_html = render_to_string("home.html")
-        self.assertEqual(response.content.decode(), expected_html)
+        expected_html = render_to_string("home.html", request=request)
+        self.assertEqualExceptCSRF(response.content.decode(), expected_html)
+
+    def test_home_page_can_save_a_POST_reqest(self):
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = 'A new list item'
+
+        response = home_page(request)
+
+        self.assertIn('A new list item', response.content.decode())
+        expected_html = render_to_string('home.html', {'new_item_text': 'A new list item'})
+        self.assertEqualExceptCSRF(response.content.decode(), expected_html)
+
+    @staticmethod
+    def remove_csrf(html_code):
+        csrf_regex = r'<input[^>]+csrfmiddlewaretoken[^>]+>'
+        return re.sub(csrf_regex, '', html_code)
+
+    def assertEqualExceptCSRF(self, html_code1, html_code2):
+        return self.assertEqual(
+            self.remove_csrf(html_code1),
+            self.remove_csrf(html_code2)
+        )
