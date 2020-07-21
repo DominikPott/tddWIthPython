@@ -10,7 +10,7 @@ class NewVisitorTest(unittest.TestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
-        self.browser.implicitly_wait(3)
+        self.browser.implicitly_wait(10)
 
     def tearDown(self):
         self.browser.quit()
@@ -48,13 +48,25 @@ class NewVisitorTest(unittest.TestCase):
 
         # There is still a textbox inviting her do add another item. The
         # enters "Use peacock feathers to make a fly" Edith is very methodical
-        self.fail("Finish the test!")
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Use peacock feathers to make a fly')
+        inputbox.send_keys(Keys.ENTER)
+        WebDriverWait(self.browser, 10).until(
+            expected_conditions.text_to_be_present_in_element(
+                (By.ID, 'id_list_table'), 'Use peacock feathers to make a fly')
+        )
 
         # The page updates again and now shows both items on her list
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_element_by_tag_name('tr')
+        #self.assertIn('1: Buy peacock feathers', [row.text for row in rows])
+        self.assertIn('2: Use peacock feathers to make a fly', [row.text for row in rows])
+
+
         # Edith wonders whether the site will remember her list. Then she sees
         # that the side has generates a unique URL for her -- there is some
         # explanatory text to that effect.
-
+        self.fail("Finish the test!")
         # She visits that URL - her to-do lists is still there.
 
         # Satisfied, she goes back to sleep
