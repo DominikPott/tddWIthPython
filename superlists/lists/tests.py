@@ -51,7 +51,7 @@ class ItemModelTest(TestCase):
         first_item.save()
 
         second_item = Item()
-        second_item.text = 'The first (ever) list item'
+        second_item.text = 'Item the second'
         second_item.save()
 
         saved_items = Item.objects.all()
